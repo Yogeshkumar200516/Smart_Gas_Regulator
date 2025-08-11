@@ -1,121 +1,181 @@
-import React from 'react';
-import { Box, Typography, useTheme, Grid, Paper } from '@mui/material';
-import GasMeterIcon from '@mui/icons-material/GasMeter';
-import WarningIcon from '@mui/icons-material/Warning';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import AvTimerIcon from '@mui/icons-material/AvTimer';
-import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
-import DevicesIcon from '@mui/icons-material/Devices';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-
-const DashboardCard = ({ title, value, icon, color }) => {
-  const theme = useTheme();
-  return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: theme.palette.mode === 'dark' ? '#1e2b44' : '#f0f4ff',
-        borderLeft: `6px solid ${color}`,
-        borderRadius: '12px',
-      }}
-    >
-      <Box>
-        <Typography variant="subtitle1" color="text.secondary">
-          {title}
-        </Typography>
-        <Typography variant="h5" fontWeight="bold">
-          {value}
-        </Typography>
-      </Box>
-      <Box color={color} fontSize="2.5rem">
-        {icon}
-      </Box>
-    </Paper>
-  );
-};
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  CircularProgress,
+} from "@mui/material";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { ref, onValue } from "firebase/database";
+import { db } from "../../firebaseConfig";
 
 export default function Dashboard() {
-  const theme = useTheme();
-  const primaryColor = theme.palette.primary.main;
+  const [sensorData, setSensorData] = useState(null);
+  const [weightHistory, setWeightHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    console.clear();
+    console.log("🔍 Setting up Firebase realtime listener...");
+
+    // 🔑 IMPORTANT: Updated ref path based on your data nesting
+    const sensorRef = ref(db, "1/sensorData");
+
+    const unsubscribe = onValue(
+      sensorRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          console.log("📡 Realtime Firebase Data:", data);
+
+          setSensorData(data);
+
+          // Update weight history with last 10 readings
+          if (data.currentWeight !== undefined && data.currentWeight !== null) {
+            setWeightHistory((prev) => [
+              ...prev.slice(-9), // Keep last 9 items
+              {
+                time: new Date().toLocaleTimeString(),
+                weight: data.currentWeight,
+              },
+            ]);
+          }
+        } else {
+          console.warn("⚠ No data found at path '1/sensorData'");
+          setSensorData(null);
+          setWeightHistory([]);
+        }
+        setLoading(false);
+      },
+      (error) => {
+        console.error("❌ Firebase read failed:", error);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      console.log("🛑 Unsubscribing from Firebase listener");
+      unsubscribe();
+    };
+  }, []);
 
   return (
-    <Box sx={{ minHeight: '100vh', px: 4, pt: 12, pb: 6 }}>
-      {/* Existing Title */}
-      <Typography
-        sx={{
-          fontSize: 24,
-          color: primaryColor,
-          textAlign: { xs: 'center', sm: 'left' },
-          fontWeight: 'bold',
-          marginBottom: 2,
-        }}
-      >
-        Dashboard Page
-      </Typography>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid container spacing={3}>
+          {/* Tare Weight */}
+          <Grid item xs={12} md={3}>
+            <Card sx={{ backgroundColor: "#1976d2", color: "#fff" }}>
+              <CardContent>
+                <Typography variant="h6">Tare Weight</Typography>
+                <Typography variant="h4">
+                  {sensorData?.tareWeight ?? "--"} kg
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
 
-      {/* Dashboard Cards */}
-      <Grid container spacing={4}>
-        <Grid item xs={12} sm={6} md={4}>
-          <DashboardCard
-            title="Current Gas Level"
-            value="65%"
-            icon={<GasMeterIcon />}
-            color="#1976d2"
-          />
+          {/* Gas Content Weight */}
+          <Grid item xs={12} md={3}>
+            <Card sx={{ backgroundColor: "#2e7d32", color: "#fff" }}>
+              <CardContent>
+                <Typography variant="h6">Gas Content Weight</Typography>
+                <Typography variant="h4">
+                  {sensorData?.gasContentWeight ?? "--"} kg
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Current Weight */}
+          <Grid item xs={12} md={3}>
+            <Card sx={{ backgroundColor: "#0288d1", color: "#fff" }}>
+              <CardContent>
+                <Typography variant="h6">Current Weight</Typography>
+                <Typography variant="h4">
+                  {sensorData?.currentWeight ?? "--"} kg
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Gas Leak */}
+          <Grid item xs={12} md={3}>
+            <Card
+              sx={{
+                backgroundColor: sensorData?.gasLeakDetected
+                  ? "#d32f2f"
+                  : "#388e3c",
+                color: "#fff",
+              }}
+            >
+              <CardContent>
+                <Typography variant="h6">Gas Leak</Typography>
+                <Typography variant="h4">
+                  {sensorData?.gasLeakDetected ? "Detected" : "Safe"}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Weight History Chart */}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Weight History
+                </Typography>
+                <Box sx={{ width: "100%", height: 300 }}>
+                  <ResponsiveContainer>
+                    <LineChart data={weightHistory}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="time" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey="weight"
+                        stroke="#1976d2"
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Debug Section */}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Raw Firebase Data (Debug)
+                </Typography>
+                <pre style={{ whiteSpace: "pre-wrap" }}>
+                  {JSON.stringify(sensorData, null, 2)}
+                </pre>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <DashboardCard
-            title="Leakage Status"
-            value="No Leak"
-            icon={<WarningIcon />}
-            color="#2e7d32"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <DashboardCard
-            title="AI Prediction"
-            value="5 Days Left"
-            icon={<AvTimerIcon />}
-            color="#ff6f00"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <DashboardCard
-            title="Last Refill Date"
-            value="June 28, 2025"
-            icon={<CalendarMonthIcon />}
-            color="#9c27b0"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <DashboardCard
-            title="System Health"
-            value="Optimal"
-            icon={<HealthAndSafetyIcon />}
-            color="#00acc1"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <DashboardCard
-            title="Connected Device"
-            value="Raspberry Pi - Active"
-            icon={<DevicesIcon />}
-            color="#f44336"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <DashboardCard
-            title="Notifications"
-            value="2 Active Alerts"
-            icon={<NotificationsActiveIcon />}
-            color="#e91e63"
-          />
-        </Grid>
-      </Grid>
-    </Box>
+      )}
+    </Container>
   );
 }
