@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, TextField, MenuItem, IconButton
+  Button, TextField, MenuItem, IconButton, useTheme, useMediaQuery, Typography, Stack
 } from '@mui/material';
 import axios from 'axios';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
+import CloseIcon from '@mui/icons-material/Close';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 
 export default function CylinderModal({
   open,
@@ -18,6 +21,9 @@ export default function CylinderModal({
   const [replacedDate, setReplacedDate] = useState('');
   const [machineId, setMachineId] = useState('');
 
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   const usedMachineIds = new Set(
     cylinders
       .filter(c => !editingCylinder || c.cylinder_id !== editingCylinder.cylinder_id)
@@ -30,7 +36,6 @@ export default function CylinderModal({
         setGasWeight(editingCylinder.gas_weight);
         setMachineId(editingCylinder.machine_id);
 
-        // ✅ Format date to yyyy-MM-dd (MySQL-safe)
         const isoDate = new Date(editingCylinder.replaced_date);
         const formatted = isoDate.toISOString().split('T')[0];
         setReplacedDate(formatted);
@@ -52,7 +57,7 @@ export default function CylinderModal({
       user_id: userId,
       machine_id: machineId,
       gas_weight: gasWeight,
-      replaced_date: replacedDate, // ✅ Format is now correct
+      replaced_date: replacedDate,
     };
 
     try {
@@ -72,8 +77,8 @@ export default function CylinderModal({
   };
 
   const handleDelete = async () => {
-    const confirm = window.confirm("Are you sure you want to delete this cylinder?");
-    if (!confirm) return;
+    const confirmDelete = window.confirm("Are you sure you want to delete this cylinder?");
+    if (!confirmDelete) return;
 
     try {
       await axios.delete(`http://localhost:5000/api/cylinders/${editingCylinder.cylinder_id}`, {
@@ -87,24 +92,60 @@ export default function CylinderModal({
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>
-        {editingCylinder ? "Edit Cylinder" : "Add Cylinder"}
-        {editingCylinder && (
-          <IconButton
-            onClick={handleDelete}
-            color="error"
-            style={{ float: 'right' }}
-            title="Delete Cylinder"
-          >
-            <DeleteIcon />
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullScreen={fullScreen}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          p: { xs: 1, sm: 0 },
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, #0f172a, #1e293b)'
+            : '#fff'
+        }
+      }}
+    >
+      {/* Title */}
+      <DialogTitle
+        sx={{
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          pb: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <LocalGasStationIcon color="primary" />
+          <Typography variant="h6" fontWeight="bold">
+            {editingCylinder ? "Edit Cylinder" : "Add New Cylinder"}
+          </Typography>
+        </Stack>
+
+        <Stack direction="row" spacing={1}>
+          {editingCylinder && (
+            <IconButton
+              onClick={handleDelete}
+              sx={{ color: theme.palette.error.main }}
+              title="Delete Cylinder"
+            >
+              <DeleteIcon />
+            </IconButton>
+          )}
+          <IconButton onClick={onClose} title="Close">
+            <CloseIcon />
           </IconButton>
-        )}
+        </Stack>
       </DialogTitle>
 
-      <DialogContent>
+      {/* Form Content */}
+      <DialogContent sx={{ mt: 1 }}>
         <TextField
           label="Gas Weight (kg)"
+          placeholder="Enter gas weight"
           fullWidth
           type="number"
           margin="normal"
@@ -135,12 +176,10 @@ export default function CylinderModal({
                 key={m.machine_id}
                 value={m.machine_id}
                 disabled={isUsed}
-                style={{
-                  opacity: isUsed ? 0.5 : 1,
-                  pointerEvents: isUsed ? 'none' : 'auto',
-                }}
+                sx={{ opacity: isUsed ? 0.5 : 1 }}
               >
-                {m.machine_name} ({m.serial_number}) {isUsed ? ' - In Use' : ''}
+                {m.machine_name} ({m.serial_number})
+                {isUsed ? ' - In Use' : ''}
               </MenuItem>
             );
           })}
@@ -148,15 +187,34 @@ export default function CylinderModal({
 
         {machines.length > 0 &&
           machines.every(m => usedMachineIds.has(m.machine_id) && m.machine_id !== machineId) && (
-            <p style={{ color: 'red', fontSize: '0.9rem' }}>
+            <Typography sx={{ color: 'error.main', fontSize: '0.9rem', mt: 1 }}>
               All machines are currently in use. Please wait until one is available.
-            </p>
+            </Typography>
           )}
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained" color="primary">
+      {/* Actions */}
+      <DialogActions
+        sx={{
+          borderTop: `1px solid ${theme.palette.divider}`,
+          p: 2,
+          justifyContent: 'space-between'
+        }}
+      >
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          color="secondary"
+          startIcon={<CloseIcon />}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="primary"
+          startIcon={<SaveIcon />}
+        >
           {editingCylinder ? "Update" : "Save"}
         </Button>
       </DialogActions>
