@@ -88,6 +88,10 @@ app.use('/api/cylinders', createCylinderRoutes(db));
 app.use('/api/firebase', firebaseRoutes);
 app.use("/api/sensors", sensorRoutes);
 
+app.get('/', (req, res) => {
+  res.send('Backend is running ✅');
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
