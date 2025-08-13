@@ -95,7 +95,7 @@ function Login({ onLoginSuccess }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: isDark ? '#111626ff' : 'background.default',
+        bgcolor: isDark ? '#193d65ff' : 'background.default',
         overflow: 'hidden',
         px: 2
       }}
