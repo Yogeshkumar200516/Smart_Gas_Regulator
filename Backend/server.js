@@ -11,6 +11,7 @@ const userRoutes = require('./src/routes/authRoutes.js');
 const machineRoutes = require('./src/routes/machines.js');
 const createCylinderRoutes = require('./src/routes/cylinders.js');
 const firebaseRoutes = require('./src/routes/firebase.js');
+const sensorRoutes = require("./src/routes/sensorRoutes.js");
 
 const app = express();
 const PORT = 5000;
@@ -85,6 +86,7 @@ app.use('/api/users', userRoutes(db));
 app.use('/api/machines', machineRoutes);
 app.use('/api/cylinders', createCylinderRoutes(db));
 app.use('/api/firebase', firebaseRoutes);
+app.use("/api/sensors", sensorRoutes);
 
 // Start server
 app.listen(PORT, () => {
