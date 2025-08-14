@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import API_BASE_URL from '../../context/Api';
 
 export default function CylinderModal({
   open,
@@ -63,11 +64,11 @@ export default function CylinderModal({
     try {
       if (editingCylinder) {
         await axios.put(
-          `http://localhost:5000/api/cylinders/${editingCylinder.cylinder_id}`,
+          `${API_BASE_URL}/api/cylinders/${editingCylinder.cylinder_id}`,
           payload
         );
       } else {
-        await axios.post('http://localhost:5000/api/cylinders', payload);
+        await axios.post(`${API_BASE_URL}/api/cylinders`, payload);
       }
       onClose();
     } catch (err) {
@@ -81,7 +82,7 @@ export default function CylinderModal({
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/cylinders/${editingCylinder.cylinder_id}`, {
+      await axios.delete(`${API_BASE_URL}/api/cylinders/${editingCylinder.cylinder_id}`, {
         params: { user_id: userId }
       });
       onClose();

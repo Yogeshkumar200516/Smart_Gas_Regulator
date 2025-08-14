@@ -25,6 +25,7 @@ import {
 import MachineModal from "./MachineModal";
 import CylinderModal from "./CylinderModal";
 import axios from "axios";
+import API_BASE_URL from "../../context/Api";
 
 export default function DataEntry() {
   const [machines, setMachines] = useState([]);
@@ -44,7 +45,7 @@ export default function DataEntry() {
   const fetchMachines = async () => {
     if (!userId) return;
     try {
-      const res = await axios.get(`http://localhost:5000/api/machines/user/${userId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/machines/user/${userId}`);
       setMachines(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("❌ Failed to fetch machines:", err);
@@ -54,7 +55,7 @@ export default function DataEntry() {
   const fetchCylinders = async () => {
     if (!userId) return;
     try {
-      const res = await axios.get(`http://localhost:5000/api/cylinders/user/${userId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/cylinders/user/${userId}`);
       setCylinders(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("❌ Failed to fetch cylinders:", err);
@@ -73,7 +74,7 @@ export default function DataEntry() {
 
   const handleDeleteMachine = async (machine_id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/machines/${machine_id}?user_id=${userId}`);
+      await axios.delete(`${API_BASE_URL}/api/machines/${machine_id}?user_id=${userId}`);
       fetchMachines();
     } catch (err) {
       console.error("❌ Delete failed:", err);
@@ -99,7 +100,7 @@ export default function DataEntry() {
 
   const handleDeleteCylinder = async (cylinder_id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/cylinders/${cylinder_id}?user_id=${userId}`);
+      await axios.delete(`${API_BASE_URL}/api/cylinders/${cylinder_id}?user_id=${userId}`);
       fetchCylinders();
     } catch (err) {
       console.error("❌ Cylinder delete failed:", err);

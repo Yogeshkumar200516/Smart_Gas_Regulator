@@ -7,6 +7,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import DevicesOtherIcon from '@mui/icons-material/DevicesOther';
+import API_BASE_URL from '../../context/Api';
 
 export default function MachineModal({ open, onClose, machine, userId }) {
   const [machine_name, setMachineName] = useState('');
@@ -43,13 +44,13 @@ export default function MachineModal({ open, onClose, machine, userId }) {
 
     try {
       if (machine) {
-        await fetch(`http://localhost:5000/api/machines/${machine.machine_id}`, {
+        await fetch(`${API_BASE_URL}/api/machines/${machine.machine_id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
       } else {
-        await fetch('http://localhost:5000/api/machines', {
+        await fetch(`${API_BASE_URL}/api/machines`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
