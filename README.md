@@ -54,7 +54,7 @@ Take a glimpse at the **UI & Dashboard** 👇
 
 1. ![Page1](./Frontend/src/assets/images/Gas1.png)
 2. ![Page2](./Frontend/src/assets/images/Gas2.png)
-3. ![Page3](./Frontend/src/assets/images/Gag3.png)
+3. ![Page3](./Frontend/src/assets/images/Gas3.png)
 4. ![Page4](./Frontend/src/assets/images/Gas4.png)
 5. ![Page5](./Frontend/src/assets/images/Gas5.png)
 6. ![Page6](./Frontend/src/assets/images/Gas6.png)
