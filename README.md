@@ -52,11 +52,15 @@ This project not only improves **safety** but also provides **predictive insight
 
 Take a glimpse at the **UI & Dashboard** 👇  
 
-1. ![Dashboard](./assets/screenshots/dashboard.jpeg)  
-2. ![Gas Leak Alert](./assets/screenshots/gas_leak_alert.jpeg)  
-3. ![Gas Level Monitor](./assets/screenshots/gas_level.jpeg)  
-4. ![Login Page](./assets/screenshots/login.jpeg)  
-5. ![Analytics](./assets/screenshots/analytics.jpeg)  
+1. ![Page1](./Frontend/src/assets/images/GIT1.jpeg)
+2. ![Page2](./Frontend/src/assets/images/GIT2.jpeg)
+3. ![Page3](./Frontend/src/assets/images/GIT3.jpeg)
+4. ![Page4](./Frontend/src/assets/images/GIT4.jpeg)
+5. ![Page5](./Frontend/src/assets/images/GIT5.jpeg)
+6. ![Page6](./Frontend/src/assets/images/GIT6.jpeg)
+7. ![Page7](./Frontend/src/assets/images/GIT7.jpeg)
+8. ![Page8](./Frontend/src/assets/images/GIT8.jpeg)
+9. ![Page9](./Frontend/src/assets/images/GIT9.jpeg)
 
 *(👉 Add your actual screenshots inside `assets/screenshots/` folder in your repo to make them visible on GitHub)*  
 
