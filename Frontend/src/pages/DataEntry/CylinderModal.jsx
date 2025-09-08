@@ -64,11 +64,11 @@ export default function CylinderModal({
     try {
       if (editingCylinder) {
         await axios.put(
-          `${API_BASE_URL}/api/cylinders/${editingCylinder.cylinder_id}`,
+          `http://localhost:5000/api/cylinders/${editingCylinder.cylinder_id}`,
           payload
         );
       } else {
-        await axios.post(`${API_BASE_URL}/api/cylinders`, payload);
+        await axios.post(`http://localhost:5000/api/cylinders`, payload);
       }
       onClose();
     } catch (err) {
@@ -82,7 +82,7 @@ export default function CylinderModal({
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`${API_BASE_URL}/api/cylinders/${editingCylinder.cylinder_id}`, {
+      await axios.delete(`http://localhost:5000/api/cylinders/${editingCylinder.cylinder_id}`, {
         params: { user_id: userId }
       });
       onClose();

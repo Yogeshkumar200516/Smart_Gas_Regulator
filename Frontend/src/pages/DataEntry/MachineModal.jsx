@@ -44,13 +44,13 @@ export default function MachineModal({ open, onClose, machine, userId }) {
 
     try {
       if (machine) {
-        await fetch(`${API_BASE_URL}/api/machines/${machine.machine_id}`, {
+        await fetch(`http://localhost:5000/api/machines/${machine.machine_id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
       } else {
-        await fetch(`${API_BASE_URL}/api/machines`, {
+        await fetch(`http://localhost:5000/api/machines`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),

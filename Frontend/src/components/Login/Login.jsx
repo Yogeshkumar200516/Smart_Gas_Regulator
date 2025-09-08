@@ -57,8 +57,8 @@ function Login({ onLoginSuccess }) {
 
     try {
       const url = isLogin
-        ? `${API_BASE_URL}/api/users/login`
-        : `${API_BASE_URL}/api/users/register`;
+        ? `http://localhost:5000/api/users/login`
+        : `http://localhost:5000/api/users/register`;
 
       const payload = isLogin
         ? { phone_no: formData.phone_no, password: formData.password }

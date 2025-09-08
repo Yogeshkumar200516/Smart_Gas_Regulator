@@ -94,14 +94,14 @@ export default function History() {
 
     async function fetchMachinesWithData() {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/sensors/machines/${userId}`);
+        const res = await fetch(`http://localhost:5000/api/sensors/machines/${userId}`);
         const machineList = await res.json();
 
         // For each machine, check sensor data availability
         const machinesWithData = await Promise.all(
           machineList.map(async (m) => {
             try {
-              const resp = await fetch(`${API_BASE_URL}/api/sensors/sensor/${m.machine_id}`);
+              const resp = await fetch(`http://localhost:5000/api/sensors/sensor/${m.machine_id}`);
               const sensorData = await resp.json();
               return {
                 ...m,
@@ -131,7 +131,7 @@ export default function History() {
   useEffect(() => {
     if (!selectedMachine) return;
     setLoading(true);
-    fetch(`${API_BASE_URL}/api/sensors/sensor/${selectedMachine}`)
+    fetch(`http://localhost:5000/api/sensors/sensor/${selectedMachine}`)
       .then((res) => res.json())
       .then((rows) => {
         setHistory(Array.isArray(rows) ? [...rows].reverse() : []);
