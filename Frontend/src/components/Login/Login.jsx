@@ -9,6 +9,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/logo.svg';
 import { ColorModeContext } from '../../context/themeContext';
+import API_BASE_URL from '../../context/Api';
 
 function Login({ onLoginSuccess }) {
   const theme = useTheme();
@@ -56,8 +57,8 @@ function Login({ onLoginSuccess }) {
 
     try {
       const url = isLogin
-        ? 'http://localhost:5000/api/users/login'
-        : 'http://localhost:5000/api/users/register';
+        ? `http://localhost:5000/api/users/login`
+        : `http://localhost:5000/api/users/register`;
 
       const payload = isLogin
         ? { phone_no: formData.phone_no, password: formData.password }
