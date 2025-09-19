@@ -73,7 +73,7 @@ router.get('/user/:user_id', (req, res) => {
   });
 });
 
-// DELETE: Delete machine (only if user owns it and not linked to cylinders)
+// DELETE: Delete machine (only if user owns it and no linked cylinders)
 router.delete('/:machine_id', (req, res) => {
   const machine_id = parseInt(req.params.machine_id);
   const user_id = parseInt(req.query.user_id);
@@ -81,6 +81,8 @@ router.delete('/:machine_id', (req, res) => {
   if (!user_id || isNaN(user_id) || !machine_id || isNaN(machine_id)) {
     return res.status(400).json({ error: 'Missing or invalid user_id or machine_id' });
   }
+
+  console.log(`Delete request for machine_id: ${machine_id} by user_id: ${user_id}`);
 
   // First check ownership
   const checkSql = 'SELECT user_id FROM machines WHERE machine_id = ?';
@@ -94,11 +96,11 @@ router.delete('/:machine_id', (req, res) => {
       return res.status(404).json({ error: 'Machine not found' });
     }
 
-    if (parseInt(results[0].user_id) !== parseInt(user_id)) {
+    if (parseInt(results[0].user_id) !== user_id) {
       return res.status(403).json({ error: 'Unauthorized: You do not own this machine' });
     }
 
-    // Now check if cylinder is using this machine
+    // Check if cylinder is using this machine
     const usageCheckSql = 'SELECT * FROM cylinders WHERE machine_id = ?';
     db.query(usageCheckSql, [machine_id], (err2, cylinderResults) => {
       if (err2) {
@@ -117,6 +119,7 @@ router.delete('/:machine_id', (req, res) => {
           console.error('❌ Error deleting machine:', err3);
           return res.status(500).json({ error: 'Failed to delete machine' });
         }
+        console.log(`Machine ${machine_id} deleted successfully.`);
         res.json({ message: '✅ Machine deleted successfully' });
       });
     });

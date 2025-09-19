@@ -1,6 +1,6 @@
 SELECT * FROM flame_shield2.sensor_data;
 
-CREATE DATABASE flame_shield2;
+CREATE DATABASE flame_shield;
 USE flame_shield2;
 -- First, create tables in the correct order
 CREATE TABLE `users` (
